@@ -6,7 +6,7 @@ import (
 )
 
 // languagePreferenceName is the name the web app's user setting stores the target
-// language under. The category is "pp_" plus the plugin ID.
+// language under. The category comes from preferenceCategory.
 const languagePreferenceName = "language"
 
 // languageOff is the setting value for "no translations".
@@ -34,11 +34,21 @@ func (p *Plugin) targetLanguage(userID string) (string, error) {
 	if appErr != nil {
 		return "", appErr
 	}
-	category := "pp_" + manifest.Id
+	category := preferenceCategory(manifest.Id)
 	for _, pref := range prefs {
 		if pref.Category == category && pref.Name == languagePreferenceName {
 			return normalizeLanguage(pref.Value), nil
 		}
 	}
 	return "", nil
+}
+
+// preferenceCategory mirrors getPluginPreferenceKey in the Mattermost web app, which
+// stores a plugin's user settings under "pp_" plus the plugin ID, cut to 32 characters.
+func preferenceCategory(pluginID string) string {
+	category := "pp_" + pluginID
+	if len(category) > 32 {
+		category = category[:32]
+	}
+	return category
 }

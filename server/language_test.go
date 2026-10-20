@@ -30,3 +30,8 @@ func TestCacheKey(t *testing.T) {
 	// Mattermost limits KV keys to 150 characters. A post ID has 26.
 	assert.LessOrEqual(t, len(cacheKey("abcdefghijklmnopqrstuvwxyz", 1<<62, "zh-hans")), 150)
 }
+
+func TestPreferenceCategory(t *testing.T) {
+	assert.Equal(t, "pp_nl.tijnschutte.translator", preferenceCategory("nl.tijnschutte.translator"))
+	assert.Equal(t, "pp_com.example.a-very-long-plugi", preferenceCategory("com.example.a-very-long-plugin-id"))
+}
