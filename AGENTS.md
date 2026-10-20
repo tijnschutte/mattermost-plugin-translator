@@ -40,6 +40,23 @@ cd webapp && npx jest src/manifest.test.tsx    # single webapp test
 make test                                      # full check, with Docker, before a release
 ```
 
+## Local Mattermost
+
+`dev/docker-compose.yml` runs Mattermost Team Edition 10.12.0 with Postgres on
+http://localhost:8065. `build/custom.mk` points `make deploy` and `make watch` at it by
+default.
+
+```bash
+make dev-up            # start it, and seed team `dev` with users `admin` and `colleague`
+make deploy            # build the plugin and install it on the local Mattermost
+make dev-down          # stop it; DEV_RESET=1 also deletes its data
+```
+
+The logins are `admin` / `Admin-dev-1!` (system admin) and `colleague` /
+`Colleague-dev-1!`. To check a change as a user, log in as `colleague` in a private
+browser window. To run admin commands, use
+`docker compose -f dev/docker-compose.yml exec mattermost mmctl --local <command>`.
+
 `make help` lists the other targets (deploy, watch, release bumps, debugger attach).
 Project-specific targets go in `build/custom.mk`.
 
