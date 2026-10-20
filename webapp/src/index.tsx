@@ -8,12 +8,14 @@ import type {GlobalState} from '@mattermost/types/store';
 
 import type {PluginRegistry} from 'types/mattermost-webapp';
 
+import PostTranslation from './post_translation';
 import {userSettings} from './user_settings';
 
 export default class Plugin {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public async initialize(registry: PluginRegistry, store: Store<GlobalState>) {
         registry.registerUserSettings(userSettings(manifest.id, manifest.name));
+        registry.registerPostMessageAttachmentComponent(PostTranslation);
     }
 }
 
