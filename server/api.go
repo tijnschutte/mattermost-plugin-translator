@@ -24,15 +24,10 @@ func (p *Plugin) initRouter() *mux.Router {
 	// Middleware to require that the user is logged in
 	router.Use(p.MattermostAuthorizationRequired)
 
-	apiRouter := router.PathPrefix("/api/v1").Subrouter()
-
-	apiRouter.HandleFunc("/hello", p.HelloWorld).Methods(http.MethodGet)
-
 	return router
 }
 
-// ServeHTTP demonstrates a plugin that handles HTTP requests by greeting the world.
-// The root URL is currently <siteUrl>/plugins/nl.tijnschutte.translator/api/v1/. Replace nl.tijnschutte.translator with the plugin ID.
+// ServeHTTP handles requests to <siteUrl>/plugins/nl.tijnschutte.translator/.
 func (p *Plugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Request) {
 	p.router.ServeHTTP(w, r)
 }
@@ -144,11 +139,4 @@ func setSecurityHeaders(next http.Handler) http.Handler {
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		next.ServeHTTP(w, r)
 	})
-}
-
-func (p *Plugin) HelloWorld(w http.ResponseWriter, r *http.Request) {
-	if _, err := w.Write([]byte("Hello, world!")); err != nil {
-		requestLogger(r).WithError(err).Errorf("Failed to write response")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }

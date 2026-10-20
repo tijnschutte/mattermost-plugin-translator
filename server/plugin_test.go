@@ -49,25 +49,6 @@ func newTestPlugin() (*Plugin, *logRecorder) {
 	return plugin, api
 }
 
-func TestServeHTTP(t *testing.T) {
-	assert := assert.New(t)
-	plugin, _ := newTestPlugin()
-	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/api/v1/hello", nil)
-	r.Header.Set("Mattermost-User-ID", "test-user-id")
-
-	plugin.ServeHTTP(nil, w, r)
-
-	result := w.Result()
-	assert.NotNil(result)
-	defer func() { _ = result.Body.Close() }()
-	bodyBytes, err := io.ReadAll(result.Body)
-	assert.Nil(err)
-	bodyString := string(bodyBytes)
-
-	assert.Equal("Hello, world!", bodyString)
-}
-
 func TestServeHTTPRecoversFromPanic(t *testing.T) {
 	t.Run("before the response is written", func(t *testing.T) {
 		plugin, api := newTestPlugin()
@@ -129,8 +110,9 @@ func TestServeHTTPLimitsRequestBody(t *testing.T) {
 
 func TestServeHTTPLogsRequests(t *testing.T) {
 	plugin, api := newTestPlugin()
+	plugin.router.HandleFunc("/api/v1/ping", func(http.ResponseWriter, *http.Request) {})
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/api/v1/hello?token=secret", nil)
+	r := httptest.NewRequest(http.MethodGet, "/api/v1/ping?token=secret", nil)
 
 	plugin.ServeHTTP(nil, w, r)
 
@@ -139,7 +121,7 @@ func TestServeHTTPLogsRequests(t *testing.T) {
 	assert.Equal(t, "debug", entry.level)
 	assert.Equal(t, "HTTP request", entry.msg)
 	assert.Equal(t, http.MethodGet, entry.fields["method"])
-	assert.Equal(t, "/api/v1/hello", entry.fields["path"])
+	assert.Equal(t, "/api/v1/ping", entry.fields["path"])
 	assert.Equal(t, http.StatusUnauthorized, entry.fields["status"])
 	assert.Equal(t, "", entry.fields["user_id"])
 	assert.NotEmpty(t, entry.fields["duration"])
