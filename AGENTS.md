@@ -48,9 +48,14 @@ default.
 
 ```bash
 make dev-up            # start it, and seed team `dev` with users `admin` and `colleague`
+make dev-up LIBRETRANSLATE=1   # also start LibreTranslate with nl, pt, and en
 make deploy            # build the plugin and install it on the local Mattermost
 make dev-down          # stop it; DEV_RESET=1 also deletes its data
 ```
+
+LibreTranslate needs no key, so it is the way to test real translations locally. Set
+**Translation service** to LibreTranslate and **LibreTranslate URL** to
+`http://libretranslate:5000`. From the laptop, it answers on http://localhost:5001.
 
 The logins are `admin` / `Admin-dev-1!` (system admin) and `colleague` /
 `Colleague-dev-1!`. To check a change as a user, log in as `colleague` in a private

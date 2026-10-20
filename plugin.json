@@ -19,15 +19,32 @@
         "bundle_path": "webapp/dist/main.js"
     },
     "settings_schema": {
-        "header": "Translations use Azure AI Translator. Create a Translator resource in the Azure portal, for example on the free F0 tier, and copy its key and region from **Keys and Endpoint**.",
+        "header": "Pick a translation service. Azure AI Translator gives the best quality, and its free F0 tier covers 2,000,000 characters per month. LibreTranslate runs on your own server, so no text leaves it.",
         "footer": "",
         "settings": [
+            {
+                "key": "Service",
+                "display_name": "Translation service:",
+                "type": "dropdown",
+                "default": "azure",
+                "help_text": "The service that translates posts.",
+                "options": [
+                    {
+                        "display_name": "Azure AI Translator",
+                        "value": "azure"
+                    },
+                    {
+                        "display_name": "LibreTranslate",
+                        "value": "libretranslate"
+                    }
+                ]
+            },
             {
                 "key": "AzureKey",
                 "display_name": "Azure key:",
                 "type": "text",
                 "secret": true,
-                "help_text": "Key 1 or Key 2 of the Translator resource. Without a key, the plugin translates nothing."
+                "help_text": "Key 1 or Key 2 of the Translator resource. Used only when the service is Azure AI Translator."
             },
             {
                 "key": "AzureRegion",
@@ -42,6 +59,20 @@
                 "type": "text",
                 "default": "https://api.cognitive.microsofttranslator.com",
                 "help_text": "Change this only for a custom or sovereign-cloud endpoint. It must start with https://."
+            },
+            {
+                "key": "LibreTranslateURL",
+                "display_name": "LibreTranslate URL:",
+                "type": "text",
+                "help_text": "The address of the LibreTranslate server, for example http://libretranslate:5000. Used only when the service is LibreTranslate.",
+                "placeholder": "http://libretranslate:5000"
+            },
+            {
+                "key": "LibreTranslateAPIKey",
+                "display_name": "LibreTranslate API key:",
+                "type": "text",
+                "secret": true,
+                "help_text": "Only if the LibreTranslate server asks for a key. Servers you host yourself usually need none."
             }
         ]
     }

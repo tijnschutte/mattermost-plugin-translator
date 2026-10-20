@@ -17,13 +17,13 @@ export MM_SERVICESETTINGS_SITEURL ?= http://localhost:8065
 export MM_ADMIN_USERNAME ?= admin
 export MM_ADMIN_PASSWORD ?= Admin-dev-1!
 
-## Starts the local Mattermost 10.12.0 on http://localhost:8065 and seeds a team and two users.
+## Starts the local Mattermost 10.12.0 on http://localhost:8065 and seeds a team and two users. Add LIBRETRANSLATE=1 to start LibreTranslate too.
 .PHONY: dev-up
 dev-up:
-	docker compose -f dev/docker-compose.yml up -d
+	docker compose -f dev/docker-compose.yml $(if $(LIBRETRANSLATE),--profile libretranslate) up -d
 	./dev/seed.sh
 
 ## Stops the local Mattermost. Add DEV_RESET=1 to delete its data too.
 .PHONY: dev-down
 dev-down:
-	docker compose -f dev/docker-compose.yml down $(if $(DEV_RESET),--volumes)
+	docker compose -f dev/docker-compose.yml --profile libretranslate down $(if $(DEV_RESET),--volumes)

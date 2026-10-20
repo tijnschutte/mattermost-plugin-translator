@@ -34,6 +34,23 @@ services:
     volumes:
       - mattermost:/mattermost/data
 
+  # Optional, a self-hosted translation service. Start it with `make dev-up LIBRETRANSLATE=1`.
+  # The first start downloads the Dutch, Portuguese, and English models.
+  libretranslate:
+    image: libretranslate/libretranslate:v1.9.6
+    profiles: [libretranslate]
+    environment:
+      LT_LOAD_ONLY: nl,pt,en
+    ports:
+      - "127.0.0.1:5001:5000"
+    volumes:
+      - libretranslate:/home/libretranslate/.local
+    healthcheck:
+      test: ["CMD-SHELL", "./venv/bin/python scripts/healthcheck.py"]
+      interval: 10s
+      retries: 60
+
 volumes:
   postgres:
   mattermost:
+  libretranslate:

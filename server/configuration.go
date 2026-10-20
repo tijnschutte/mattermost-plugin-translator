@@ -22,33 +22,77 @@ import (
 // If you add non-reference types to your configuration struct, be sure to rewrite Clone as a deep
 // copy appropriate for your types.
 type configuration struct {
+	Service string
+
 	AzureKey      string
 	AzureRegion   string
 	AzureEndpoint string
 
-	// translator is built from the fields above. It is nil when no key is set.
+	LibreTranslateURL    string
+	LibreTranslateAPIKey string
+
+	// translator is built from the fields above. It is nil when the chosen service is
+	// not set up.
 	translator translator.Translator
+}
+
+const (
+	serviceAzure          = "azure"
+	serviceLibreTranslate = "libretranslate"
+)
+
+// service returns the chosen service. An empty value means Azure, the default.
+func (c *configuration) service() string {
+	if c.Service == "" {
+		return serviceAzure
+	}
+	return c.Service
 }
 
 // validate rejects settings that can never work.
 func (c *configuration) validate() error {
-	if c.AzureEndpoint == "" {
-		return nil
-	}
-	u, err := url.Parse(c.AzureEndpoint)
-	if err != nil || u.Scheme != "https" || u.Host == "" {
-		return errors.Errorf("Azure endpoint %q must be an https URL", c.AzureEndpoint)
+	switch c.service() {
+	case serviceAzure:
+		if c.AzureEndpoint == "" {
+			return nil
+		}
+		u, err := url.Parse(c.AzureEndpoint)
+		if err != nil || u.Scheme != "https" || u.Host == "" {
+			return errors.Errorf("Azure endpoint %q must be an https URL", c.AzureEndpoint)
+		}
+	case serviceLibreTranslate:
+		if c.LibreTranslateURL == "" {
+			return nil
+		}
+		// A server in the same cluster or Docker network is often reached over plain http.
+		u, err := url.Parse(c.LibreTranslateURL)
+		if err != nil || (u.Scheme != "https" && u.Scheme != "http") || u.Host == "" {
+			return errors.Errorf("LibreTranslate URL %q must be an http or https URL", c.LibreTranslateURL)
+		}
+	default:
+		return errors.Errorf("unknown translation service %q", c.Service)
 	}
 	return nil
 }
 
-// newTranslator returns the translator these settings describe, or nil without a key.
+// newTranslator returns the translator these settings describe, or nil when the chosen
+// service is not set up.
 func (c *configuration) newTranslator() translator.Translator {
-	key := strings.TrimSpace(c.AzureKey)
-	if key == "" {
-		return nil
+	switch c.service() {
+	case serviceAzure:
+		key := strings.TrimSpace(c.AzureKey)
+		if key == "" {
+			return nil
+		}
+		return translator.NewAzure(strings.TrimRight(c.AzureEndpoint, "/"), key, strings.TrimSpace(c.AzureRegion))
+	case serviceLibreTranslate:
+		u := strings.TrimSpace(c.LibreTranslateURL)
+		if u == "" {
+			return nil
+		}
+		return translator.NewLibreTranslate(u, strings.TrimSpace(c.LibreTranslateAPIKey))
 	}
-	return translator.NewAzure(strings.TrimRight(c.AzureEndpoint, "/"), key, strings.TrimSpace(c.AzureRegion))
+	return nil
 }
 
 // Clone shallow copies the configuration. Your implementation may require a deep copy if
@@ -113,7 +157,7 @@ func (p *Plugin) OnConfigurationChange() error {
 	}
 	configuration.translator = configuration.newTranslator()
 	if configuration.translator == nil {
-		p.API.LogWarn("No Azure key is set, so the plugin translates nothing")
+		p.API.LogWarn("The translation service is not set up, so the plugin translates nothing", "service", configuration.service())
 	}
 
 	p.setConfiguration(configuration)

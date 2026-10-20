@@ -5,8 +5,14 @@ the Dutch team's posts in Portuguese, and the Dutch team reads the Portuguese us
 in Dutch. The original post does not change, and each user sees only their own
 translation.
 
-The plugin uses [Azure AI Translator](https://azure.microsoft.com/products/ai-services/ai-translator).
-Its free F0 tier covers 2,000,000 characters per month.
+The plugin works with one of two translation services:
+
+- [Azure AI Translator](https://azure.microsoft.com/products/ai-services/ai-translator)
+  gives the best quality. Its free F0 tier covers 2,000,000 characters per month, but
+  Azure asks for a credit card to sign up.
+- [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate) runs on your own
+  server, so no text leaves it, and it needs no account. Its quality is lower, and it
+  often translates technical words literally.
 
 ## How it works
 
@@ -30,24 +36,40 @@ plugin uploads turned on.
 2. In the System Console, go to **Plugins** > **Plugin Management**.
 3. Under **Upload Plugin**, upload the file. Then click **Enable** next to **Translator**.
 
-## Connect Azure AI Translator
+## Connect a translation service
+
+In the System Console, go to **Plugins** > **Translator**, and pick a **Translation
+service**. Then follow the steps for that service.
+
+### Azure AI Translator
 
 1. In the [Azure portal](https://portal.azure.com), create a **Translator** resource.
    Choose the **Free F0** pricing tier. Azure asks for a credit card, but an F0 resource
    does not charge it.
 2. In the resource, open **Keys and Endpoint**. Copy **Key 1** and **Location/Region**.
-3. In the System Console, go to **Plugins** > **Translator**.
-4. Paste the key into **Azure key**, and the region into **Azure region**. Click
-   **Save**.
+3. In the plugin settings, paste the key into **Azure key**, and the region into
+   **Azure region**. Click **Save**.
 
 When the free quota is used up, Azure refuses more text until the next month. The plugin
 then shows no translations, logs one warning, and tries again an hour later.
 
+### LibreTranslate
+
+1. Run LibreTranslate where the Mattermost server can reach it. To load only the
+   languages you need, set `LT_LOAD_ONLY`, for example to `nl,pt,en`. LibreTranslate then
+   needs about 2 GB of memory.
+2. In the plugin settings, enter its address in **LibreTranslate URL**, for example
+   `http://libretranslate:5000`. Click **Save**.
+
+LibreTranslate has no regional variants, so it translates into European Portuguese for
+both Portuguese settings.
+
 ## Privacy
 
-The plugin sends the text of a post to Azure when a user with a language setting views
-it. Check that this is allowed under your organization's data rules before you turn the
-plugin on.
+With Azure AI Translator, the plugin sends the text of a post to Azure when a user with a
+language setting views it. Check that this is allowed under your organization's data
+rules before you turn the plugin on. With LibreTranslate, the text goes only to the
+server you run.
 
 ## Known limitations
 
