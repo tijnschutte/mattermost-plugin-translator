@@ -56,13 +56,13 @@ then shows no translations, logs one warning, and tries again an hour later.
 ### LibreTranslate
 
 1. Run LibreTranslate where the Mattermost server can reach it. To load only the
-   languages you need, set `LT_LOAD_ONLY`, for example to `nl,pt,en`. LibreTranslate then
-   needs about 2 GB of memory.
+   languages you need, set `LT_LOAD_ONLY`, for example to `nl,pt,en`. With those three
+   languages, it used about 1.3 GB of memory after a few translations.
 2. In the plugin settings, enter its address in **LibreTranslate URL**, for example
    `http://libretranslate:5000`. Click **Save**.
 
-LibreTranslate has no regional variants, so it translates into European Portuguese for
-both Portuguese settings.
+LibreTranslate has one Portuguese model with no regional variant, so both Portuguese
+settings get the same translation.
 
 ## Privacy
 
