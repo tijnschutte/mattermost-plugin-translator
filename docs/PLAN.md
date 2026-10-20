@@ -26,7 +26,9 @@ not change. The first users are one Portuguese colleague and the Dutch team.
 - **Burst control.** One channel view mounts many post components at once. Use
   `golang.org/x/sync/singleflight` per cache key, and cap the parallel Azure calls.
 - **Translator interface** in `server/translator`:
-  `Translate(ctx, text, to string) (translated, detectedFrom string, err error)`.
+  `Translate(ctx, texts []string, to string) ([]Result, error)`. It takes a batch,
+  because Azure, DeepL, and LibreTranslate all accept one. `TranslateMessage` splits a
+  post into prose and code, sends only the prose, and puts the post back together.
   Azure AI Translator is the first implementation. DeepL or LibreTranslate can follow
   without changes elsewhere.
 - **Quota.** Azure F0 answers with error `403001` when the month's quota is used. The
