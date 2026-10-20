@@ -18,11 +18,14 @@ not change. The first users are one Portuguese colleague and the Dutch team.
      Without this check, any user can read any post through the endpoint.
   3. Read the target language from the user's preferences: category
      `pp_nl.tijnschutte.translator`, name `language`. No language means no translation.
+     The plugin reads all of the user's preferences, because `GetPreferenceForUser`
+     answers `400` both for a missing preference and for a database error.
   4. Look up the KV cache by `(postId, targetLang)`. On a miss, call the translator and
      store the result.
 - **Cache.** Store the translated text and the detected source language. If the source
   language is the target language, store an empty result, so the next view makes no call.
-  `MessageHasBeenUpdated` deletes the cache entries for the edited post.
+  The key holds the post's `EditAt`, so an edited post gets a new key and needs no
+  cleanup hook. Entries expire after 30 days.
 - **Burst control.** One channel view mounts many post components at once. Use
   `golang.org/x/sync/singleflight` per cache key, and cap the parallel Azure calls.
 - **Translator interface** in `server/translator`:
@@ -72,10 +75,11 @@ waits for review and an explicit go.
    blocks left untranslated.
 5. **Plugin settings.** Azure key (`secret: true`), region, and endpoint in
    `plugin.json`. Validate them in `OnConfigurationChange`.
-6. **Language preference and cache.** Read the user's language, and the KV cache with the
-   `MessageHasBeenUpdated` cleanup. Unit tests.
-7. **Endpoint.** The route, the permission check, `singleflight`, and the call limit.
-   Unit tests on `ServeHTTP` with a fake translator.
+6. **Language preference, cache, and endpoint.** Done as one commit, because the
+   preference and cache code has no caller without the endpoint. Read the user's
+   language, the KV cache, the route, the permission check, `singleflight`, the call
+   limit, and the quota pause. Unit tests with a fake translator and cache.
+7. *(Merged into commit 6.)*
 8. **Web app: language setting.** `registerUserSettings` with a language choice. The
    default is "Off".
 9. **Web app: translation under the post.** `registerPostMessageAttachmentComponent`

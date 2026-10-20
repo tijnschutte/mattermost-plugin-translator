@@ -37,6 +37,10 @@ func (l *logRecorder) LogDebug(msg string, keyValuePairs ...any) {
 	l.record("debug", msg, keyValuePairs)
 }
 
+func (l *logRecorder) LogWarn(msg string, keyValuePairs ...any) {
+	l.record("warn", msg, keyValuePairs)
+}
+
 func (l *logRecorder) LogError(msg string, keyValuePairs ...any) {
 	l.record("error", msg, keyValuePairs)
 }

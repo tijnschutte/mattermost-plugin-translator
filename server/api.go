@@ -24,6 +24,9 @@ func (p *Plugin) initRouter() *mux.Router {
 	// Middleware to require that the user is logged in
 	router.Use(p.MattermostAuthorizationRequired)
 
+	apiRouter := router.PathPrefix("/api/v1").Subrouter()
+	apiRouter.HandleFunc("/posts/{postId}/translation", p.handleGetTranslation).Methods(http.MethodGet)
+
 	return router
 }
 
