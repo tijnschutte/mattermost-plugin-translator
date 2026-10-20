@@ -6,14 +6,12 @@ export type Language = {
 
 export const LANGUAGE_OFF = 'off';
 
+// Only the languages the production LibreTranslate loads (LT_LOAD_ONLY=nl,pt,en in
+// infra-lab). A language missing there gives the user no translations and no error.
 export const LANGUAGES: Language[] = [
     {code: 'nl', name: 'Nederlands'},
-    {code: 'pt-pt', name: 'Português (Portugal)'},
-    {code: 'pt', name: 'Português (Brasil)'},
+    {code: 'pt-pt', name: 'Português'},
     {code: 'en', name: 'English'},
-    {code: 'de', name: 'Deutsch'},
-    {code: 'fr', name: 'Français'},
-    {code: 'es', name: 'Español'},
 ];
 
 const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});

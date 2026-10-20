@@ -61,8 +61,9 @@ then shows no translations, logs one warning, and tries again an hour later.
 2. In the plugin settings, enter its address in **LibreTranslate URL**, for example
    `http://libretranslate:5000`. Click **Save**.
 
-LibreTranslate has one Portuguese model with no regional variant, so both Portuguese
-settings get the same translation.
+The settings window offers Dutch, Portuguese, and English, the languages LibreTranslate
+loads in production. To offer another language, load its model in LibreTranslate first,
+then add it to `webapp/src/languages.ts`.
 
 ## Privacy
 

@@ -14,12 +14,12 @@ describe('detectedLanguageName', () => {
 });
 
 describe('userSettings', () => {
-    it('offers Off first and stores under the language name', () => {
+    it('offers Off and the three languages, stored under the language name', () => {
         const section = userSettings('id', 'Translator').sections[0];
         const setting = 'settings' in section ? section.settings[0] : undefined;
 
         expect(setting?.name).toBe('language');
         expect(setting?.type).toBe('radio');
-        expect(setting && 'options' in setting ? setting.options[0].value : '').toBe('off');
+        expect(setting && 'options' in setting ? setting.options.map((o) => o.value) : []).toEqual(['off', 'nl', 'pt-pt', 'en']);
     });
 });
