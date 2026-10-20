@@ -29,7 +29,7 @@ the plan one commit at a time.
 
 ## Commands
 
-Run `make quick` before you ask for review. It runs `go vet`, `golangci-lint`, the server
+Run `make quick` before you ask for review. It runs `go mod tidy -diff`, `go vet`, `golangci-lint`, the server
 unit tests, and the web app lint, type check, and tests. It needs no Docker.
 
 ```bash

@@ -1,8 +1,9 @@
 # Include custom targets and environment variables here
 
-## Fast check while iterating: go vet, golangci-lint, server unit tests, webapp lint, types, and tests. No Docker.
+## Fast check while iterating: go mod tidy, go vet, golangci-lint, server unit tests, webapp lint, types, and tests. No Docker.
 .PHONY: quick
 quick: apply webapp/node_modules
+	$(GO) mod tidy -diff
 	$(GO) vet ./...
 	$(GOBIN)/golangci-lint run ./...
 	SKIP_DOCKER_TESTS=1 $(GO) test ./server/...
