@@ -16,14 +16,16 @@ export const LANGUAGES: Language[] = [
     {code: 'es', name: 'Español'},
 ];
 
-// languageName returns the display name for a code such as "nl" or "pt-PT", or the code
-// itself when the list does not have it.
-export function languageName(code: string): string {
-    const lower = code.toLowerCase();
-    const exact = LANGUAGES.find((l) => l.code === lower);
-    if (exact) {
-        return exact.name;
+const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
+
+// detectedLanguageName names the language a service detected, such as "nl" or "pt-PT".
+// It names only the base language, because services detect "pt" without a region.
+// An unknown code comes back as is.
+export function detectedLanguageName(code: string): string {
+    const base = code.toLowerCase().split('-')[0];
+    try {
+        return displayNames.of(base) ?? code;
+    } catch {
+        return code;
     }
-    const base = lower.split('-')[0];
-    return LANGUAGES.find((l) => l.code === base)?.name ?? code;
 }

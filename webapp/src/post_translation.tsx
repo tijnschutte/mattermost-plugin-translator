@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 
 import type {GlobalState} from '@mattermost/types/store';
 
-import {LANGUAGE_OFF, languageName} from './languages';
+import {LANGUAGE_OFF, detectedLanguageName} from './languages';
 import type {Translation} from './translation_api';
 import {fetchTranslation} from './translation_api';
 import {LANGUAGE_SETTING} from './user_settings';
@@ -63,7 +63,7 @@ export default function PostTranslation({postId}: Props) {
         return null;
     }
 
-    const label = `Translated from ${languageName(translation.detected_language)}`;
+    const label = `Translated from ${detectedLanguageName(translation.detected_language)}`;
     return (
         <div
             className='translator-post-translation'

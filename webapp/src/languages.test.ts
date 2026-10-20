@@ -1,17 +1,15 @@
-import {languageName} from './languages';
+import {detectedLanguageName} from './languages';
 import {userSettings} from './user_settings';
 
-describe('languageName', () => {
-    it('finds a code in any case', () => {
-        expect(languageName('pt-PT')).toBe('Português (Portugal)');
+describe('detectedLanguageName', () => {
+    it('names the base language only', () => {
+        expect(detectedLanguageName('pt')).toBe('Portuguese');
+        expect(detectedLanguageName('pt-PT')).toBe('Portuguese');
+        expect(detectedLanguageName('nl')).toBe('Dutch');
     });
 
-    it('falls back to the base language', () => {
-        expect(languageName('nl-BE')).toBe('Nederlands');
-    });
-
-    it('returns an unknown code as is', () => {
-        expect(languageName('ja')).toBe('ja');
+    it('returns an invalid code as is', () => {
+        expect(detectedLanguageName('123')).toBe('123');
     });
 });
 
