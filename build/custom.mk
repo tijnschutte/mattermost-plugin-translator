@@ -8,6 +8,9 @@ quick: apply webapp/node_modules
 	SKIP_DOCKER_TESTS=1 $(GO) test ./server/...
 	cd webapp && npm run lint && npm run check-types && npx jest
 
+# Integration tests run against the Mattermost version production runs.
+export MM_TEST_IMAGE ?= mattermost/mattermost-team-edition:10.12.0
+
 # make deploy and make watch target the local Mattermost from dev/ unless you override these.
 export MM_SERVICESETTINGS_SITEURL ?= http://localhost:8065
 export MM_ADMIN_USERNAME ?= admin

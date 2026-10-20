@@ -93,8 +93,9 @@ Integration test caveats:
 
 - There is no build tag, so `go test ./...` includes them and fails without Docker.
   `SKIP_DOCKER_TESTS=1` skips them.
-- Set `MM_TEST_IMAGE=mattermost/mattermost-team-edition:10.12.0` to test against the
-  version production runs. The default image is `mattermost-enterprise-edition:latest`.
+- `build/custom.mk` sets `MM_TEST_IMAGE=mattermost/mattermost-team-edition:10.12.0`, the
+  version production runs. When you run `go test` by hand, set it yourself; the
+  testhelper default is `mattermost-enterprise-edition:latest`.
 - They test the bundle in `dist/`, which must be linux/amd64. After a server change,
   rebuild it before you run one by hand:
   ```bash
