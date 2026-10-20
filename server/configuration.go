@@ -1,9 +1,13 @@
 package main
 
 import (
+	"net/url"
 	"reflect"
+	"strings"
 
 	"github.com/pkg/errors"
+
+	"github.com/tijnschutte/mattermost-plugin-translator/server/translator"
 )
 
 // configuration captures the plugin's external configuration as exposed in the Mattermost server
@@ -17,7 +21,35 @@ import (
 //
 // If you add non-reference types to your configuration struct, be sure to rewrite Clone as a deep
 // copy appropriate for your types.
-type configuration struct{}
+type configuration struct {
+	AzureKey      string
+	AzureRegion   string
+	AzureEndpoint string
+
+	// translator is built from the fields above. It is nil when no key is set.
+	translator translator.Translator
+}
+
+// validate rejects settings that can never work.
+func (c *configuration) validate() error {
+	if c.AzureEndpoint == "" {
+		return nil
+	}
+	u, err := url.Parse(c.AzureEndpoint)
+	if err != nil || u.Scheme != "https" || u.Host == "" {
+		return errors.Errorf("Azure endpoint %q must be an https URL", c.AzureEndpoint)
+	}
+	return nil
+}
+
+// newTranslator returns the translator these settings describe, or nil without a key.
+func (c *configuration) newTranslator() translator.Translator {
+	key := strings.TrimSpace(c.AzureKey)
+	if key == "" {
+		return nil
+	}
+	return translator.NewAzure(strings.TrimRight(c.AzureEndpoint, "/"), key, strings.TrimSpace(c.AzureRegion))
+}
 
 // Clone shallow copies the configuration. Your implementation may require a deep copy if
 // your configuration has reference types.
@@ -74,6 +106,14 @@ func (p *Plugin) OnConfigurationChange() error {
 	// Load the public configuration fields from the Mattermost server configuration.
 	if err := p.API.LoadPluginConfiguration(configuration); err != nil {
 		return errors.Wrap(err, "failed to load plugin configuration")
+	}
+
+	if err := configuration.validate(); err != nil {
+		return errors.Wrap(err, "invalid plugin configuration")
+	}
+	configuration.translator = configuration.newTranslator()
+	if configuration.translator == nil {
+		p.API.LogWarn("No Azure key is set, so the plugin translates nothing")
 	}
 
 	p.setConfiguration(configuration)

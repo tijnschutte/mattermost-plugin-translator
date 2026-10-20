@@ -19,8 +19,30 @@
         "bundle_path": "webapp/dist/main.js"
     },
     "settings_schema": {
-        "header": "",
+        "header": "Translations use Azure AI Translator. Create a Translator resource in the Azure portal, for example on the free F0 tier, and copy its key and region from **Keys and Endpoint**.",
         "footer": "",
-        "settings": []
+        "settings": [
+            {
+                "key": "AzureKey",
+                "display_name": "Azure key:",
+                "type": "text",
+                "secret": true,
+                "help_text": "Key 1 or Key 2 of the Translator resource. Without a key, the plugin translates nothing."
+            },
+            {
+                "key": "AzureRegion",
+                "display_name": "Azure region:",
+                "type": "text",
+                "help_text": "The region of the Translator resource, for example westeurope. Leave empty for a global resource.",
+                "placeholder": "westeurope"
+            },
+            {
+                "key": "AzureEndpoint",
+                "display_name": "Azure endpoint:",
+                "type": "text",
+                "default": "https://api.cognitive.microsofttranslator.com",
+                "help_text": "Change this only for a custom or sovereign-cloud endpoint. It must start with https://."
+            }
+        ]
     }
 }
